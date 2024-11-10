@@ -19,10 +19,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
     final response = await query.query();
 
-    if (response.success && response.results != null) {
-      setState(() {
-        _tasks = response.results as List<ParseObject>;
-      });
+    if (response.success) {
+      if (response.results != null) {
+        setState(() {
+          _tasks = response.results as List<ParseObject>;
+        });
+      } else {
+        print("Response : ${response.error?.message}");
+      }
     } else {
       print("Failed to fetch tasks: ${response.error?.message}");
     }

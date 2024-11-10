@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
-// import 'package:quick_task/screens/task_list_screen.dart';
+import 'package:quick_task/screens/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -29,9 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
     var response = await user.login();
 
     if (response.success) {
-      // Navigator.pushReplacement(
-      //     context, MaterialPageRoute(builder: (context) => TaskListScreen()));
-
       Navigator.pushReplacementNamed(context, '/taskList');
     } else {
       ScaffoldMessenger.of(context)
@@ -59,16 +56,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true),
             const SizedBox(height: 20),
-            ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStatePropertyAll(Colors.deepPurple.shade300)),
-                onPressed: _login,
-                child: const Text(
-                  'Login',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStatePropertyAll(Colors.deepPurple.shade300)),
+                  onPressed: _login,
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignupScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: Colors.deepPurple,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
