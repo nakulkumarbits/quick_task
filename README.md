@@ -1,5 +1,8 @@
 # QuickTask
 
+### Cross Platform Application Development (Merged - SEZG585/SSZG585)(S1-24) Assignment
+2023mt93202@wilp.bits-pilani.ac.in (NAKUL KUMAR)
+
 ### Objective:
 
 QuickTask is a simplified task management app designed to help users organize their tasks efficiently.
