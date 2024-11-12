@@ -19,6 +19,7 @@ class _SignupScreenState extends State<SignupScreen> {
     String confirmPassword = _confirmPasswordController.text.trim();
     String email = _emailController.text.trim();
 
+    // Validate the input fields and display error message to the user.
     if (username.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty ||
@@ -33,6 +34,7 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    // Validate if password entered correctly by the user else display error to the user.
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text(
@@ -46,6 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final user = ParseUser(username, password, email);
     var response = await user.signUp();
 
+    // Display the message if Sign up is successful.
     if (response.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -72,6 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Prepare the AppBar for the Sign up screen.
       appBar: AppBar(
         title: const Text('Sign Up'),
         backgroundColor: Colors.deepPurple,
@@ -97,6 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email')),
             const SizedBox(height: 20),
+            // Invoke the registerUser method when user clicks the button.
             ElevatedButton(
               onPressed: _registerUser,
               style: ButtonStyle(

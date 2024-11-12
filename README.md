@@ -1,16 +1,29 @@
-# quick_task
+# QuickTask
 
-A new Flutter project.
+### Objective:
 
-## Getting Started
+QuickTask is a simplified task management app designed to help users organize their tasks efficiently.
 
-This project is a starting point for a Flutter application.
+This project aims to introduce students to Flutter and Back4App by building a basic task management app with essential features.
 
-A few resources to get you started if this is your first Flutter project:
+### Pre-requisties to run/develop application locally.
+- Install flutter on local.
+- A text editor like VS Code.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Features implemented:
+1. User Authentication:
+   - Basic user authentication using Back4App.
+   - Allow users to sign up and log in to the app securely.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. Task Management:
+   - Users can add, edit, view, and delete tasks.
+   - Each task have a title and a due date.
+
+3. Task Status:
+   - Tasks can be marked as completed or incomplete with the help of a toggle.
+
+### Project Structure:
+- Frontend: Developed using Flutter.
+- Backend: Used Back4App to handle user authentication and data storage.
+
+## Demonstration Videos

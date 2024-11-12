@@ -14,6 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
+
+    // Check if username or password is empty and display error message to the user.
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text(
@@ -28,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = ParseUser(username, password, null);
     var response = await user.login();
 
+    // Route to taskList in case of successful login.
     if (response.success) {
       Navigator.pushReplacementNamed(context, '/taskList');
     } else {
@@ -39,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Prepare the AppBar for the Login screen.
       appBar: AppBar(
         title: const Text('Login'),
         backgroundColor: Colors.deepPurple,
@@ -59,6 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // Display the Login button and route to login method when pressed.
                 ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
@@ -70,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
+                // Display the Sign up button and route to Signup screen when pressed.
                 ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:

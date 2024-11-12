@@ -20,6 +20,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
     final response = await query.query();
 
+    // Populate the result to be displayed to the user when fetched successfully.
     if (response.success) {
       if (response.results != null) {
         setState(() {
@@ -81,7 +82,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
     }
   }
 
-  // Log out the current user
+  // Log out the current user and route back to the login screen.
   Future<void> _logout() async {
     final response = await ParseUser.currentUser() as ParseUser?;
     if (response != null) {
@@ -93,7 +94,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
   // Show dialog to add or edit a task
   Future<Map<String, dynamic>?> _showTaskDialog(
       {String? currentTitle, DateTime? currentDueDate}) async {
-    String? taskTitle = currentTitle;
     DateTime? taskDueDate = currentDueDate;
     TextEditingController titleController =
         TextEditingController(text: currentTitle); // Use a single controller
@@ -108,7 +108,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  // onChanged: (value) => taskTitle = value,
                   controller: titleController, // Use the retained controller
                   decoration:
                       const InputDecoration(hintText: "Enter task title"),
@@ -123,6 +122,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                       style: TextStyle(color: Colors.grey.shade700),
                     ),
                     const Spacer(),
+                    // Display the date picker to the user.
                     TextButton(
                       onPressed: () async {
                         DateTime? pickedDate = await showDatePicker(
@@ -173,23 +173,26 @@ class _TaskListScreenState extends State<TaskListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.deepPurple.shade300,
+      // Prepare the AppBar for the Tasks screen.
       appBar: AppBar(
         title: const Text('Tasks'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: _logout,
           ),
         ],
       ),
+      // Display the tasks to the user.
       body: ListView.builder(
         itemCount: _tasks.length,
         itemBuilder: (context, index) {
           final task = _tasks[index];
           final dueDate = task.get<DateTime>('dueDate');
           return Dismissible(
+            // Prepare the edit slider for the task.
             key: ValueKey(task.objectId),
             background: Container(
               color: Colors.amberAccent,
@@ -197,6 +200,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Icon(Icons.edit, color: Colors.white),
             ),
+            // Prepare the delete slider for the task.
             secondaryBackground: Container(
               color: Colors.red,
               alignment: Alignment.centerRight,
@@ -264,6 +268,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
           );
         },
       ),
+      // Display button to add the task.
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await _showTaskDialog();
