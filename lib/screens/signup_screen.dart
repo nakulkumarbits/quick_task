@@ -9,14 +9,20 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
   Future<void> _registerUser() async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
+    String confirmPassword = _confirmPasswordController.text.trim();
     String email = _emailController.text.trim();
 
-    if (username.isEmpty || password.isEmpty || email.isEmpty) {
+    if (username.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty ||
+        email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text(
           'All fields are required!',
@@ -27,6 +33,16 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          'Password do not match!!',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Colors.red.shade500,
+      ));
+      return;
+    }
     final user = ParseUser(username, password, email);
     var response = await user.signUp();
 
@@ -59,6 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
       appBar: AppBar(
         title: const Text('Sign Up'),
         backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -72,18 +89,23 @@ class _SignupScreenState extends State<SignupScreen> {
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true),
             TextField(
+              controller: _confirmPasswordController,
+              decoration: const InputDecoration(labelText: 'Re-enter Password'),
+              obscureText: true,
+            ),
+            TextField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email')),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _registerUser,
+              style: ButtonStyle(
+                  backgroundColor:
+                      WidgetStatePropertyAll(Colors.deepPurple.shade300)),
               child: const Text(
                 'Sign Up',
                 style: TextStyle(color: Colors.white),
               ),
-              style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(Colors.deepPurple.shade300)),
             ),
           ],
         ),

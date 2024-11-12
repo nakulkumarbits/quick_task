@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
 class TaskListScreen extends StatefulWidget {
@@ -33,13 +34,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   // Add a new task to the database
-  Future<void> addTask(String title) async {
+  Future<void> addTask(String title, DateTime? dueDate) async {
     final currentUser = await ParseUser.currentUser() as ParseUser?;
     if (currentUser != null) {
       final task = ParseObject('Task')
         ..set('title', title)
         ..set('completed', false)
-        ..set('user', currentUser);
+        ..set('user', currentUser)
+        ..set('dueDate', dueDate); // Set due date if provided
 
       final response = await task.save();
       if (response.success) {
@@ -52,9 +54,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   // Edit an existing task
-  Future<void> editTask(ParseObject task, String newTitle) async {
+  Future<void> editTask(
+      ParseObject task, String newTitle, DateTime? newDueDate) async {
     setState(() {
-      task.set('title', newTitle); // Update title locally
+      task.set('title', newTitle);
+      task.set('dueDate', newDueDate); // Update title duedate locally
     });
 
     final response = await task.save();
@@ -87,32 +91,76 @@ class _TaskListScreenState extends State<TaskListScreen> {
   }
 
   // Show dialog to add or edit a task
-  Future<String?> _showTaskDialog({String? currentTitle}) async {
+  Future<Map<String, dynamic>?> _showTaskDialog(
+      {String? currentTitle, DateTime? currentDueDate}) async {
     String? taskTitle = currentTitle;
-    await showDialog(
+    DateTime? taskDueDate = currentDueDate;
+    TextEditingController titleController =
+        TextEditingController(text: currentTitle); // Use a single controller
+
+    return await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(currentTitle == null ? 'Add New Task' : 'Edit Task'),
-          content: TextField(
-            onChanged: (value) => taskTitle = value,
-            controller: TextEditingController(text: currentTitle),
-            decoration: InputDecoration(hintText: "Enter task title"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text(currentTitle == null ? 'Add New Task' : 'Edit Task'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  // onChanged: (value) => taskTitle = value,
+                  controller: titleController, // Use the retained controller
+                  decoration:
+                      const InputDecoration(hintText: "Enter task title"),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Text(
+                      taskDueDate != null
+                          ? "Due: ${DateFormat.yMMMd().format(taskDueDate!)}"
+                          : "No due date",
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: taskDueDate ?? DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate != null) {
+                          setState(() => taskDueDate = pickedDate);
+                        }
+                      },
+                      child: const Text("Pick Due Date"),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, taskTitle),
-              child: Text("Save"),
-            ),
-          ],
-        );
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, null); // Return null on cancel
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, {
+                  'title':
+                      titleController.text, // Retrieve text from controller
+                  'dueDate': taskDueDate,
+                }),
+                child: const Text("Save"),
+              ),
+            ],
+          );
+        });
       },
     );
-    return taskTitle;
   }
 
   @override
@@ -140,27 +188,30 @@ class _TaskListScreenState extends State<TaskListScreen> {
         itemCount: _tasks.length,
         itemBuilder: (context, index) {
           final task = _tasks[index];
+          final dueDate = task.get<DateTime>('dueDate');
           return Dismissible(
             key: ValueKey(task.objectId),
             background: Container(
               color: Colors.amberAccent,
               alignment: Alignment.centerLeft,
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Icon(Icons.edit, color: Colors.white),
             ),
             secondaryBackground: Container(
               color: Colors.red,
               alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             confirmDismiss: (direction) async {
               if (direction == DismissDirection.startToEnd) {
                 // Edit task on right swipe
-                final newTitle = await _showTaskDialog(
-                    currentTitle: task.get<String>('title'));
-                if (newTitle != null && newTitle.isNotEmpty) {
-                  await editTask(task, newTitle);
+                final result = await _showTaskDialog(
+                  currentTitle: task.get<String>('title'),
+                  currentDueDate: dueDate,
+                );
+                if (result != null) {
+                  await editTask(task, result['title'], result['dueDate']);
                 }
                 return false; // Prevent actual dismissal
               } else if (direction == DismissDirection.endToStart) {
@@ -187,6 +238,12 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   decorationThickness: 2,
                 ),
               ),
+              subtitle: dueDate != null
+                  ? Text(
+                      "Due: ${DateFormat.yMMMd().format(dueDate)}",
+                      style: const TextStyle(color: Colors.white70),
+                    )
+                  : null,
               trailing: Checkbox(
                 value: task.get<bool>('completed') ?? false,
                 onChanged: (bool? value) async {
@@ -209,9 +266,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final title = await _showTaskDialog();
-          if (title != null && title.isNotEmpty) {
-            await addTask(title); // Add task and refresh the list
+          final result = await _showTaskDialog();
+          if (result != null) {
+            await addTask(result['title'],
+                result['dueDate']); // Add task and refresh the list
           }
         },
         child: const Icon(Icons.add),

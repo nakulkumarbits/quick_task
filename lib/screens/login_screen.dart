@@ -70,7 +70,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
-                TextButton(
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStatePropertyAll(Colors.deepPurple.shade300)),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -80,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     'Sign Up',
                     style: TextStyle(
-                      color: Colors.deepPurple,
+                      color: Colors.white70,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
