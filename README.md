@@ -30,3 +30,6 @@ This project aims to introduce students to Flutter and Back4App by building a ba
 - Backend: Used Back4App to handle user authentication and data storage.
 
 ## Demonstration Videos
+- [Code structure](https://youtu.be/HSdxpJDHHPw)
+- [Sign up and CRUD operations on app](https://youtu.be/45fCcOkKOdg)
+- [Login as existing user and CRUD operations on app](https://youtu.be/U_IoBE-JRFc)
